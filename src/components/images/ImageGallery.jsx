@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllImages, toggleImages, deleteImage } from '@/store/slices/imageSlice';
+import { fetchAllImages, toggleImages, deleteImage, searchImages, clearSearch } from '@/store/slices/imageSlice';
 import { Skeleton } from '@/components/ui/skeleton';
 import ImageModal from './ImageModal.jsx';
 import ImageUploader from './ImageUploader.jsx';
@@ -13,7 +13,7 @@ import {
 
 export default function ImageGallery({ albumId, isOwner }) {
     const dispatch = useDispatch();
-    const { imagesData, fetchImagesStatus } = useSelector((state) => state.imageSlice);
+    const { imagesData, fetchImagesStatus, searchResults, searchStatus } = useSelector((state) => state.imageSlice);
     const [selectedImage, setSelectedImage] = useState(null);
     const [showUploader, setShowUploader] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -28,6 +28,17 @@ export default function ImageGallery({ albumId, isOwner }) {
             dispatch(fetchAllImages(albumId));
         }
     }, [albumId, dispatch]);
+
+    useEffect(() => {
+        if (!searchTerm.trim()) {
+            dispatch(clearSearch());
+            return;
+        }
+        const timer = setTimeout(() => {
+            dispatch(searchImages({ albumId, query: searchTerm }));
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [searchTerm, albumId, dispatch]);
 
     const handleToggleFavorite = async (imageId) => {
         const currentImage = imagesData.find(img => img._id === imageId);
@@ -80,29 +91,29 @@ export default function ImageGallery({ albumId, isOwner }) {
         }
     };
 
+    const isSearching = searchTerm.trim().length > 0;
+
     const filteredAndSortedImages = React.useMemo(() => {
-        let filtered = [...imagesData];
-        if (searchTerm) {
-            filtered = filtered.filter(img =>
-                img.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                img.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-            );
-        }
-        switch (sortBy) {
-            case 'latest':
-                filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                break;
-            case 'oldest':
-                filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                break;
-            case 'favorites':
-                filtered.sort((a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0));
-                break;
-            default:
-                break;
+        let base = isSearching ? searchResults : imagesData;
+        let filtered = [...base];
+        
+        if (!isSearching) {
+            switch (sortBy) {
+                case 'latest':
+                    filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    break;
+                case 'oldest':
+                    filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                    break;
+                case 'favorites':
+                    filtered.sort((a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0));
+                    break;
+                default:
+                    break;
+            }
         }
         return filtered;
-    }, [imagesData, searchTerm, sortBy]);
+    }, [imagesData, searchResults, isSearching, sortBy]);
 
     if (fetchImagesStatus === 'loading') {
         return (
@@ -132,7 +143,7 @@ export default function ImageGallery({ albumId, isOwner }) {
                 <div className="flex gap-4">
                     <input
                         type="text"
-                        placeholder="Search by name or tag..."
+                        placeholder="Search photos with AI..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
@@ -159,7 +170,14 @@ export default function ImageGallery({ albumId, isOwner }) {
             </div>
 
             {/* Image Grid */}
-            {filteredAndSortedImages.length === 0 ? (
+            {
+            searchStatus === 'loading' && isSearching ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 p-6">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <Skeleton key={i} className="aspect-square rounded-lg" />
+                        ))}
+                    </div>
+                ) : filteredAndSortedImages.length === 0 ? (
                 <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg">
                     <p className="text-gray-500">No images found</p>
                     {searchTerm && (

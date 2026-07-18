@@ -16,6 +16,10 @@ const initialState = {
     toggleStatus: "idle",
     commentStatus: "idle",
 
+    // at search state
+    searchResults: [],
+    searchStatus: "idle",
+
     imageError: null,
 }
 
@@ -89,6 +93,15 @@ export const commentImages = createAsyncThunk("image/commented", async( { imageI
     }
 })
 
+export const searchImages = createAsyncThunk("image/search", async ({ albumId, query }, { rejectWithValue }) => {
+    try {
+        const response = await axiosInstance.get(`/image/search`, { params: { query, albumId } });
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message ?? error.message ?? 'Unknown error');
+    }
+})
+
 
 const imageReducer = createSlice({
     name: "image",
@@ -103,6 +116,11 @@ const imageReducer = createSlice({
             state.toggleStatus = "idle";
             state.commentStatus = "idle";
             state.imageError = null;
+            state.searchStatus = "idle";
+        },
+        clearSearch: (state) => {
+            state.searchResults = [];
+            state.searchStatus = "idle";
         }
     },
     extraReducers: (builder)=>{
@@ -242,11 +260,22 @@ const imageReducer = createSlice({
         .addCase(deleteImage.rejected, (state, action)=>{
             state.deleteStatus = "error";
             state.imageError = action.payload;
+        })// AI search
+        .addCase(searchImages.pending, (state)=>{
+            state.searchStatus = "loading";
+        })
+        .addCase(searchImages.fulfilled, (state, action)=>{
+            state.searchStatus = "success";
+            state.searchResults = action.payload?.images || [];
+        })
+        .addCase(searchImages.rejected, (state, action)=>{
+            state.searchStatus = "error";
+            state.imageError = action.payload;
         })
     }
 });
 
-export const { clearImageStatus } = imageReducer.actions;
+export const { clearImageStatus, clearSearch } = imageReducer.actions;
 
 const { reducer } = imageReducer;
 export default reducer;
