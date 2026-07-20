@@ -5,14 +5,11 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 export default function ImageCard({ image, onToggleFavorite, onDelete, onDownload, onClick, isOwner }) {
-    const [isHovered, setIsHovered] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
 
     return (
         <Card
             className="relative overflow-hidden cursor-pointer group aspect-square rounded-lg p-0"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
             onClick={onClick}
         >
             {/* Image */}
@@ -25,19 +22,17 @@ export default function ImageCard({ image, onToggleFavorite, onDelete, onDownloa
                 <img
                     src={image.url}
                     alt={image.name}
-                    className={`w-full h-full object-cover transition-all duration-300 ${
+                    className={`w-full h-full object-cover transition-all duration-300 md:group-hover:scale-105 ${
                         imageLoaded ? 'opacity-100' : 'opacity-0'
-                    } ${isHovered ? 'scale-105' : 'scale-100'}`}
+                    }`}
                     onLoad={() => setImageLoaded(true)}
                     loading="lazy"
                 />
             </div>
 
-            {/* Overlay Controls */}
+            {/* Overlay Controls — always visible on mobile, hover-revealed on desktop */}
             <div
-                className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
-                    isHovered ? 'opacity-100' : 'opacity-0'
-                }`}
+                className="absolute inset-0 bg-black/50 transition-opacity duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100"
             >
                 <div className="absolute top-2 right-2 flex gap-2">
                     <button
@@ -70,7 +65,7 @@ export default function ImageCard({ image, onToggleFavorite, onDelete, onDownloa
                         </button>
                     )}
                 </div>
-                
+
                 <div className="absolute bottom-2 left-2 right-2">
                     <p className="text-white text-sm font-medium truncate">{image.name}</p>
                     {image.tags?.length > 0 && (
@@ -84,13 +79,6 @@ export default function ImageCard({ image, onToggleFavorite, onDelete, onDownloa
                     )}
                 </div>
             </div>
-
-            {/* Favorite Badge */}
-            {image.isFavorite && !isHovered && (
-                <div className="absolute top-2 right-2">
-                    <Heart className="w-5 h-5 fill-red-500 text-red-500 drop-shadow-lg" />
-                </div>
-            )}
         </Card>
     );
 }

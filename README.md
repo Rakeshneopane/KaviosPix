@@ -4,7 +4,7 @@
 
 A photo management web app built with React, Redux Toolkit, and Tailwind CSS. Think Google Photos, but built by one person who learned a lot about cookies along the way.
 
-**Backend Repo:** [KaviosPix Backend](https://github.com/Rakeshneopane/kaviosPix-backend)
+**Backend Repo:** [KaviosPix Backend](https://github.com/Rakeshneopane/kaviosPix-backend) · **AI Service Repo:** [KaviosPix AI Service](https://github.com/Rakeshneopane/kaviospix-aiservice)
 
 ---
 
@@ -23,6 +23,27 @@ Click **"Continue with Google"** and sign in with any Google account to access t
 
 ---
 
+## Screenshots
+
+**Login**
+![Login screenshot](./screenshots/login.png)
+
+**Dashboard**
+![Dashboard screenshot](./screenshots/dashboard.png)
+
+**Gallery**
+![Gallery screenshot](./screenshots/gallery.png)
+
+**AI Search**
+![AI search screenshot](./screenshots/ai-search.png)
+
+**Image Detail**
+![Image detail screenshot](./screenshots/image-detail.png)
+
+**Image Upload**
+![Image upload screenshot](./screenshots/image-upload.png)
+
+---
 ## API Reference
 
 This is the frontend repository. For full API documentation, including all routes and sample responses, see the [Backend Repository](https://github.com/Rakeshneopane/kaviosPix-backend).
@@ -81,6 +102,7 @@ Four days. Two bugs. One lesson I will never forget: ** HTTP-only cookies persis
 - 👥 **Permission Control** — Shared users can view but not upload, delete, or share
 - 🔄 **Silent Token Refresh** — Axios interceptor handles JWT expiry. Users never see a 401.
 - 📱 **Responsive** — Mobile and desktop
+- 🔍 **AI-Powered Search** — describe a photo in plain language instead of remembering tags; debounced search bar calls a semantic-search backend endpoint
 
 ---
 
@@ -176,6 +198,9 @@ The alternative is checking token expiry in every component or every thunk. The 
 
 **Why `clearAlbumStatus` on album detail unmount?**  
 Without it, navigating back to the dashboard shows stale album data. The reset forces a fresh fetch when the dashboard mounts again.
+
+**Why debounce the AI search input by 400ms?**  
+Every keystroke would otherwise fire a network request to the backend, which forwards it to the AI service, which makes a Gemini API call — an expensive round trip to run on every letter typed. A 400ms debounce waits for the user to actually pause before searching, cutting API calls (and Gemini quota usage) dramatically for typical typing speed, at the cost of a slight delay before results appear.
 
 ---
 
