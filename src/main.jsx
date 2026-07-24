@@ -14,8 +14,18 @@ import { DashBoardPage } from './pages/DashBoardPage.jsx';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import AlbumsPage from './components/albums/AlbumsPage.jsx';
 import AlbumDetailPage from "./components/albums/AlbumDetailsPage.jsx"
+import LandingPage from "./pages/LandingPage.jsx";
+import { Toaster } from "sonner";
+
+
+import RouteErrorPage from "./pages/RouteErrorPage.jsx";
+import RouteLoadingPage from "./pages/RouteLoadingPage.jsx";
 
 const router = createBrowserRouter([ 
+  {
+    path: "/",
+    element: <LandingPage />,
+  },
   {
     path: "/login",
     element: <LoginPage />
@@ -25,19 +35,14 @@ const router = createBrowserRouter([
     element: <GoogleCallbackPage />
   },
   {
-    path: "/",
     element: (
       <ProtectedRoute> 
         <App /> 
       </ProtectedRoute>
     ),
-    errorElement: <h1> Something Went Wrong. </h1>,
-    hydrateFallbackElement: <h1> Fallback Element: Loading... Just for reference now.</h1>,
-    children: [
-      {
-        index: true,          
-        element: <Navigate to="dashboard" replace={true} /> 
-      },      
+    errorElement: <RouteErrorPage />,
+    hydrateFallbackElement:  <RouteLoadingPage />,
+    children: [   
       {
         path: "/dashboard",
         element: <DashBoardPage />
@@ -58,6 +63,7 @@ createRoot(document.getElementById('root')).render(
   <>
     <Provider store={store}>
       <RouterProvider router={router} />
+      
     </Provider>
   </>,
 )

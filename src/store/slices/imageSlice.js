@@ -107,6 +107,17 @@ const imageReducer = createSlice({
     name: "image",
     initialState,
     reducers: {
+        // clearImageStatus: (state) => {
+        //     state.fetchImagesStatus = "idle";
+        //     state.fetchFavoritesStatus = "idle";
+        //     state.fetchSingleStatus = "idle";
+        //     state.uploadStatus = "idle";
+        //     state.deleteStatus = "idle";
+        //     state.toggleStatus = "idle";
+        //     state.commentStatus = "idle";
+        //     state.imageError = null;
+        //     state.searchStatus = "idle";
+        // },
         clearImageStatus: (state) => {
             state.fetchImagesStatus = "idle";
             state.fetchFavoritesStatus = "idle";
@@ -115,8 +126,11 @@ const imageReducer = createSlice({
             state.deleteStatus = "idle";
             state.toggleStatus = "idle";
             state.commentStatus = "idle";
-            state.imageError = null;
+
             state.searchStatus = "idle";
+            state.searchResults = [];
+
+            state.imageError = null;
         },
         clearSearch: (state) => {
             state.searchResults = [];

@@ -1,73 +1,128 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
+import {
+  Camera ,
+} from "lucide-react";
 
-const Footer = () => {
+import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { Separator } from "@/components/ui/separator";
+
+export default function Footer() {
+  const currentYear = new Date().getFullYear();
+  const githubUrl = import.meta.env.VITE_GITHUB_URL;
+  const linkedinUrl = import.meta.env.VITE_LINKEDIN_URL;
+
   return (
-    <footer className="bg-gray-100 text-black mt-auto">
-      {/* Main Footer */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="mt-auto border-t bg-background">
+      {/* Main footer */}
+      <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           
-          {/* Column 1 - Company */}
-          <div>
-            <h3 className="font-bold text-lg mb-3">KaviosPix</h3>
-            <p className="text-gray-400 text-sm hover:text-gray-900">
-              Making great products since 2024.
+          {/* Brand */}
+          <div className="sm:col-span-2">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2"
+            >
+               <div className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                  <Camera className="size-4" />
+                </div>
+
+              <span className="text-lg font-semibold tracking-tight">
+                KaviosPix
+              </span>
+            </Link>
+
+            <p className="mt-3 max-w-sm text-sm leading-6 text-muted-foreground">
+              A simple place to organize, discover, and
+              revisit the photos that matter to you.
             </p>
           </div>
 
-          {/* Column 2 - Links */}
-          <div>
-            <h3 className="font-bold text-lg mb-3">Quick Links</h3>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-400 hover:text-gray-900">About</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-gray-900">Services</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-gray-900">Contact</a></li>
-            </ul>
-          </div>
+          {/* Product */}
+           <div>
+    <h3 className="text-sm font-semibold">
+      Product
+    </h3>
 
-          {/* Column 3 - Support */}
-          <div>
-            <h3 className="font-bold text-lg mb-3">Support</h3>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-400 hover:text-gray-900">FAQ</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-gray-900">Privacy Policy</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-gray-900">Terms of Service</a></li>
-            </ul>
-          </div>
+    <nav className="mt-4 flex flex-col items-start gap-3 text-sm text-muted-foreground">
+      <Link
+        to="/dashboard"
+        className="transition-colors hover:text-foreground"
+      >
+        Dashboard
+      </Link>
 
-          {/* Column 4 - Newsletter */}
-          <div>
-            <h3 className="font-bold text-lg mb-3">Newsletter</h3>
-            <div className="flex gap-2">
-              <Input 
-                type="email" 
-                placeholder="Your email" 
-                className="bg-gray-100 border-gray-700"
-              />
-              <Button size="sm">Subscribe</Button>
-            </div>
-          </div>
+      <Link
+        to="/albums"
+        className="transition-colors hover:text-foreground"
+      >
+        Albums
+      </Link>
+    </nav>
+  </div>
+
+  {/* Social */}
+  <div>
+    <h3 className="text-sm font-semibold">
+      Connect
+    </h3>
+
+    <div className="mt-4 flex flex-col items-start gap-3 text-sm text-muted-foreground">
+      <a
+        href={githubUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="transition-colors hover:text-foreground"
+      >
+        GitHub
+      </a>
+
+      <a
+        href={linkedinUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="transition-colors hover:text-foreground"
+      >
+        LinkedIn
+      </a>
+    </div>
+  </div>
         </div>
       </div>
 
-      <Separator className="bg-gray-800" />
+      <Separator />
 
-      {/* Bottom Bar */}
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
-          <p>© 2024 KaviosPix. All rights reserved.</p>
-          <div className="flex gap-4 mt-2 md:mt-0">
-            <a href="#" className="hover:text-gray-900">Twitter</a>
-            <a href="#" className="hover:text-gray-900">LinkedIn</a>
-            <a href="#" className="hover:text-gray-900">GitHub</a>
-          </div>
+      {/* Bottom bar */}
+      <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          
+          <p className="text-sm text-muted-foreground">
+            &copy; {currentYear} KaviosPix. All rights reserved.
+          </p>
+
+          {/* <div className="flex items-center gap-10">
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="KaviosPix on GitHub"
+              className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <FaGithub className="size-4" /> GitHub
+            </a>
+
+            <a
+              href={linkedinUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="KaviosPix on LinkedIn"
+              className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <FaLinkedin className="size-4" /> Linkedin
+            </a>
+          </div> */}
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

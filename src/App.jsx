@@ -1,23 +1,27 @@
-import { Outlet } from "react-router-dom"
-import Footer from "@/components/Footer/Footer.jsx"
-import NavbarComponent from "@/components/navbar/Navbar.jsx";
-import { Dialog } from "@/components/ui/dialog.jsx";
-import './App.css';
+import { Outlet } from "react-router-dom";
 import { Toaster } from "sonner";
+import Footer from "./components/Footer/Footer";
+
+import NavbarComponent from "@/components/navbar/Navbar";
 
 function App() {
   return (
-    <Dialog>
-      <div className="min-h-screen flex flex-col bg-gray-100">
-        <NavbarComponent />
-        <main className="flex-1">
-          <Outlet />
-        </main>
-        <Footer />
-        <Toaster position="top-right" richColors closeButton />
-      </div>
-    </Dialog>
-  )
+    <div className="flex min-h-svh flex-col bg-background text-foreground">
+      <NavbarComponent />
+
+      <main className="flex-1">
+        <Outlet />
+      </main>
+
+      <Footer />
+
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+      />
+    </div>
+  );
 }
 
-export default App
+export default App;
