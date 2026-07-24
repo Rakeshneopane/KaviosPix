@@ -1,50 +1,52 @@
-import { Navigate } from "react-router-dom"
+import { Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUser } from "../store/slices/authSlice.js"
 
-export const ProtectedRoute = ({ children , requiredRole = null})=>{
+import { fetchUser } from "@/store/slices/authSlice";
+import RouteLoadingPage from "@/pages/RouteLoadingPage";
 
-    const { userData : user, userStatus, userError } = useSelector((state)=> {
-        console.log("state from protected route ",state);
-        return state.userSlice});
+export const ProtectedRoute = ({
+  children,
+  requiredRole = null,
+}) => {
+  const dispatch = useDispatch();
 
-    const dispatch = useDispatch();
+  const {
+    userData: user,
+    userStatus,
+  } = useSelector((state) => state.userSlice);
 
-    useEffect(() => {
-        const loadUser = async() =>{
-            if(userStatus === "idle") {
-                try {
-                    await dispatch(fetchUser()).unwrap();
-                } catch (error) {
-                    console.log("Error from Protected route while fetching user by thunk.", error.message);
-                } 
-            }
-        }
-        loadUser();
-
-    }, [dispatch, userStatus]);
-
-    // console.log( userStatus, userError, user );
-    if(userStatus === "loading" || userStatus === "idle"){
-        console.log("userStatus: ", userStatus);
-        return( <div> Loading... from protected route compo </div>)
+  useEffect(() => {
+    if (userStatus === "idle") {
+      dispatch(fetchUser());
     }
-    
-    if (userStatus === "error") {
-        console.log("Error fetching user:", userError);
-        return <Navigate to="/login" replace={true} />;
-    }
+  }, [dispatch, userStatus]);
 
-    if(!user){
-        console.log("rejecting from protected route.");
-        return <Navigate to="/login" replace={true} />;
-    }
+  if (
+    userStatus === "idle" ||
+    userStatus === "loading"
+  ) {
+    return <RouteLoadingPage />;
+  }
 
-    const userRole = user?.role || "user";
-    if(userRole !== requiredRole && requiredRole){
-        return <Navigate to="/unauthorized" replace={true} />;
-    }
+  if (
+    userStatus === "error" ||
+    !user
+  ) {
+    return <Navigate to="/login" replace />;
+  }
 
-    return children;
-}
+  if (
+    requiredRole &&
+    user.role !== requiredRole
+  ) {
+    return (
+      <Navigate
+        to="/unauthorized"
+        replace
+      />
+    );
+  }
+
+  return children;
+};
