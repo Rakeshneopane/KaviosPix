@@ -99,28 +99,6 @@ export default function Footer() {
           <p className="text-sm text-muted-foreground">
             &copy; {currentYear} KaviosPix. All rights reserved.
           </p>
-
-          {/* <div className="flex items-center gap-10">
-            <a
-              href={githubUrl}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="KaviosPix on GitHub"
-              className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <FaGithub className="size-4" /> GitHub
-            </a>
-
-            <a
-              href={linkedinUrl}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="KaviosPix on LinkedIn"
-              className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <FaLinkedin className="size-4" /> Linkedin
-            </a>
-          </div> */}
         </div>
       </div>
     </footer>
