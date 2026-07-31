@@ -9,6 +9,30 @@ KaviosPix is a responsive photo-management web application built with React, Red
 
 ---
 
+## System Overview
+
+KaviosPix is split across three independently deployed repos:
+
+| Service | Stack | Hosting |
+|---|---|---|
+| **Frontend** (this repo) | React, Vite, Redux Toolkit, Tailwind, shadcn/ui | Vercel |
+| **[Backend](https://github.com/Rakeshneopane/kaviosPix-backend)** | Node.js, Express, MongoDB | Render |
+| **[AI Service](https://github.com/Rakeshneopane/kaviospix-aiservice)** | Python, FastAPI, PostgreSQL + pgvector, Google Gemini | AWS EC2 (Docker) |
+
+```text
+Frontend (Vercel)
+      │
+      ▼
+Backend (Render)  ──── image URL ────▶  AI Service (EC2)
+      │                                   │
+      ▼                                   ▼
+   MongoDB                    Postgres + pgvector (captions,tags,embeddings)
+```
+
+The AI service is a standalone FastAPI microservice, not a third-party API call — it runs in its own Docker container on a dedicated EC2 instance, generates captions/tags/embeddings via Gemini, and stores them in Postgres with pgvector for similarity search. The backend talks to it over an authenticated internal HTTP API (`X-API-Key`).
+
+---
+
 ## Table of Contents
 
 1. [Demo](#demo)
@@ -89,6 +113,7 @@ The public landing page is available at `/`. Authentication uses Google OAuth; a
 - 💬 **Comments** — Add comments to individual photos.
 - 📥 **Downloads** — Download photos directly from the gallery.
 - 🔍 **AI-Powered Semantic Search** — Describe a photo naturally and retrieve visually relevant images.
+- 🏷️ **AI Auto-Captioning & Tagging** — Every uploaded image is automatically captioned and tagged by Google Gemini via a dedicated FastAPI microservice, with results stored alongside a semantic embedding for search.
 - ⚡ **Debounced Search** — Prevents an AI request from firing on every keystroke.
 - 🔄 **Silent Token Refresh** — Axios interceptors refresh expired access tokens automatically.
 - 🔒 **Protected Routes** — Dashboard, albums, and album details require an authenticated user.
@@ -106,6 +131,7 @@ The public landing page is available at `/`. Authentication uses Google OAuth; a
 | **UI** | Tailwind CSS, shadcn/ui, Radix UI, Lucide React, React Icons, Sonner |
 | **API Communication** | Axios, FormData (image uploads) |
 | **Authentication** | Google OAuth, protected client-side routes |
+| **AI Service** | Python, FastAPI, PostgreSQL, pgvector, Google Gemini API — deployed on AWS EC2 via Docker |
 
 ---
 
@@ -477,6 +503,14 @@ The lesson that stuck:
 
 > **HttpOnly cookies can persist across browser reloads. In-memory Redux state does not.**
 
+### The other debugging story: shrinking the AI service to fit
+
+The AI service didn't live in this repo, but it shaped how I built AI Search into the frontend, so it's worth mentioning.
+
+The first version of the AI service used CLIP running locally for embeddings. It worked — but `torch` alone pulled in gigabytes of dependencies, including unused CUDA/GPU libraries, pushing the Docker image past 1.5GB. That blew through the disk space on a free-tier EC2 instance with about 6.7GB total.
+
+Switching to Gemini's multimodal embedding API removed the local model entirely, shrinking the image to under 400MB and letting the whole service run on modest infrastructure — at the cost of one extra network call per embedding instead of a local computation. That tradeoff (a slightly slower captioning step in exchange for not needing a paid EBS volume resize) is the kind of decision that doesn't show up in a feature list but is exactly what "AI-powered search" actually costs to ship.
+
 ---
 
 ## What I Learned
@@ -491,6 +525,7 @@ Building KaviosPix involved much more than rendering a photo grid. Some of the m
 - Loading, empty, error, and success states all need deliberate UI.
 - AI-powered features need frontend request control such as debouncing.
 - Production environments expose assumptions that localhost often hides.
+- Splitting AI functionality into its own service (rather than bolting it onto Node/Mongo) kept the core app simple and let the AI service use a database better suited to vector search.
 
 ---
 
